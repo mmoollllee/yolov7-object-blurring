@@ -3,13 +3,13 @@
 ### Steps to run Code
 - Clone the repository.
 ```
-git clone https://github.com/RizwanMunawar/yolov7-object-blurring.git
+git clone git@github.com:mmoollllee/yolov7-object-blurring.git
 ```
 - Goto the cloned folder.
 ```
 cd yolov7-object-blurring
 ```
-- Create a virtual envirnoment (Recommended, If you dont want to disturb python packages)
+- Create a virtual envirnoment (optional & recommended, If you dont want to disturb python packages)
 ```
 ### For Linux Users
 python3 -m venv yolov7objblurring
@@ -35,32 +35,19 @@ pip install -r requirements.txt
 - Run the code with mentioned command below.
 ```
 #if you want to change source file
-python detect_and_blur.py --weights yolov7.pt --source "your video.mp4" --blurratio 20
+python detect_and_blur.py --weights yolov7.pt --source "input/folder" --blurratio 20
 
-#for specific class (person)
-python detect_and_blur.py --weights yolov7.pt --source "your video.mp4" -classes 0 --blurratio 50
+#for specific classes
+python detect_and_blur.py --weights yolov7.pt --source "your video.mp4" --classes 0  --blurratio 50
 
 #hide-detected-bounding-boxes
-python detect_and_blur.py --weights yolov7.pt --source "your video.mp4" -classes 0 --blurratio 50 --hidedetarea
+python detect_and_blur.py --weights yolov7.pt --source "your video.mp4" --classes 0 --blurratio 50 --hidedetarea
 ```
 - Output file will be created in the <b>working-dir/runs/detect/exp</b> with original filename.
 
-### Results
-<table>
-  <tr>
-    <td>Objects Blurred A</td>
-    <td>Objects Blurred B</td>
-    <td>Objects Blurred Hide detected area</td>
-  </tr>
-  <tr>
-    <td><img src="https://user-images.githubusercontent.com/62513924/186101334-1de03f51-9f64-41fd-b488-b77eb949865d.png"></td>
-    <td><img src="https://user-images.githubusercontent.com/62513924/186101348-3b06d516-5507-4548-8efa-9b55564a75fe.png"></td>
-    <td><img src="https://user-images.githubusercontent.com/62513924/186102964-59f89ae2-80ac-43c9-ab64-54c607a1cbe9.png"></td>
-  </tr>
- </table>
 
 
- ### References
+### References
  - https://github.com/WongKinYiu/yolov7
  - https://opencv.org/
  
