@@ -889,3 +889,15 @@ def increment_path(path, increment_dest=False, sep=''):
         i = [int(m.groups()[0]) for m in matches if m]  # indices
         n = max(i) + 1 if i else 2  # increment number
         return f"{path}{sep}{n}"  # update path
+
+# def soft_blur_with_mask(image: np.ndarray, mask: np.ndarray) -> np.ndarray:
+#     # https://note.nkmk.me/en/python-pillow-composite/
+#     copy = image.copy()
+#     mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
+#     cnts = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+#     cnts = cnts[0] if len(cnts) == 2 else cnts[1]
+#     for c in cnts:
+#         x,y,w,h = cv2.boundingRect(c)
+#         ROI = image[y:y+h, x:x+w]
+#         image[y:y+h, x:x+w] = cv2.GaussianBlur(ROI, (41,41), 0)
+#     return image
