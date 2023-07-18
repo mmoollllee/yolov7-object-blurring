@@ -59,9 +59,6 @@ def detect(save_img=False):
     else:
         dataset = LoadImages(source, img_size=imgsz, stride=stride, limit=opt.limit, rotate=opt.rotate)
 
-    if (opt.limit):
-        dataset = dataset[:opt.limit]
-
     # Get names and colors
     names = model.module.names if hasattr(model, 'module') else model.names
     colors = [[random.randint(0, 255) for _ in range(3)] for _ in names]
@@ -73,7 +70,12 @@ def detect(save_img=False):
     old_img_b = 1
 
     t0 = time.time()
+    limiter = 0
     for path, img, im0s, vid_cap in dataset:
+        limiter += 1
+        if (limiter == opt.limit):
+            break
+
         img = torch.from_numpy(img).to(device)
         img = img.half() if half else img.float()  # uint8 to fp16/32
         img /= 255.0  # 0 - 255 to 0.0 - 1.0
