@@ -158,9 +158,9 @@ def detect(save_img=False):
                 if dataset.mode == 'image':
                     file_name, file_type = os.path.splitext(save_path)
                     if (file_type == "webp"):
-                        options = [int(cv2.IMWRITE_WEBP_QUALITY), 60]
+                        options = [int(cv2.IMWRITE_WEBP_QUALITY), opt.compression]
                     elif  (file_type == "jpg" or file_type == "jpeg"):
-                        options = [cv2.IMWRITE_JPEG_QUALITY, 80, cv2.IMWRITE_JPEG_OPTIMIZE, 1]
+                        options = [cv2.IMWRITE_JPEG_QUALITY, opt.compression, cv2.IMWRITE_JPEG_OPTIMIZE, 1]
                     else:
                         options = []
                     cv2.imwrite(save_path, im0, options)
@@ -222,6 +222,7 @@ if __name__ == '__main__':
     parser.add_argument('--delete',action='store_true', help='Delete Input Files')
     parser.add_argument('--rotate',type=int, default=0, help='Rotate clockwise 90, 180, 270')
     parser.add_argument('--limit',type=int, default=10, help='Limit images to process')
+    parser.add_argument('--compression',type=int, default=60, help='Compression Value for Output Images')
     opt = parser.parse_args()
     print(opt)
 
