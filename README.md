@@ -32,6 +32,17 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 - Download [yolov7](https://github.com/WongKinYiu/yolov7/releases/download/v0.1/yolov7.pt) object detection weights from link and move them to the working directory {yolov7-object-blurring}
+- Create a config.txt to set default parameters
+```
+[Defaults]
+source = ../webcam
+img_size = 3264
+conf_thres = 0.1
+blurratio = 10
+delete = true
+hidedetarea = true
+rotate = 90
+```
 - Run the code with mentioned command below.
 ```
 #if you want to change source file

@@ -2,5 +2,7 @@
 /output/*
 __pycache__
 *.pt
+.DS_Store
+log.txt
 
 !.gitkeep

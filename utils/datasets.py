@@ -126,7 +126,7 @@ class _RepeatSampler(object):
 
 
 class LoadImages:  # for inference
-    def __init__(self, path, img_size=640, stride=32):
+    def __init__(self, path, img_size=640, stride=32, limit=0, rotate=0):
         p = str(Path(path).absolute())  # os-agnostic absolute path
         if '*' in p:
             files = sorted(glob.glob(p, recursive=True))  # glob
@@ -141,7 +141,11 @@ class LoadImages:  # for inference
         videos = [x for x in files if x.split('.')[-1].lower() in vid_formats]
         ni, nv = len(images), len(videos)
 
+        if (limit):
+            images = images[:limit]
+
         self.img_size = img_size
+        self.rotate = rotate
         self.stride = stride
         self.files = images + videos
         self.nf = ni + nv  # number of files
@@ -184,6 +188,14 @@ class LoadImages:  # for inference
             # Read image
             self.count += 1
             img0 = cv2.imread(path)  # BGR
+
+            if (self.rotate == 90):
+                img0 = cv2.rotate(img0, cv2.ROTATE_90_CLOCKWISE)
+            elif (self.rotate == 180):
+                img0 = cv2.rotate(img0, cv2.ROTATE_180)
+            elif (self.rotate == 270):
+                img0 = cv2.rotate(img0, cv2.ROTATE_90_COUNTERCLOCKWISE)
+
             assert img0 is not None, 'Image Not Found ' + path
             #print(f'image {self.count}/{self.nf} {path}: ', end='')
 

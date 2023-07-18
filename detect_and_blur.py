@@ -1,5 +1,6 @@
 #Object Crop Using YOLOv7
 import argparse
+import configparser
 import time
 from pathlib import Path
 import os
@@ -14,6 +15,7 @@ from utils.general import check_img_size, check_requirements, check_imshow, non_
     scale_coords, xyxy2xywh, strip_optimizer, set_logging, increment_path
 from utils.plots import plot_one_box
 from utils.torch_utils import select_device, load_classifier, time_synchronized, TracedModel
+from utils.lock import lock_script
 
 
 def detect(save_img=False):
@@ -55,7 +57,7 @@ def detect(save_img=False):
         cudnn.benchmark = True  # set True to speed up constant image size inference
         dataset = LoadStreams(source, img_size=imgsz, stride=stride)
     else:
-        dataset = LoadImages(source, img_size=imgsz, stride=stride)
+        dataset = LoadImages(source, img_size=imgsz, stride=stride, limit=opt.limit, rotate=opt.rotate)
 
     # Get names and colors
     names = model.module.names if hasattr(model, 'module') else model.names
@@ -149,7 +151,7 @@ def detect(save_img=False):
             # Save results (image with detections)
             if save_img:
                 if dataset.mode == 'image':
-                    options = [cv2.IMWRITE_JPEG_QUALITY, 80, cv2.IMWRITE_JPEG_OPTIMIZE, 1, cv2.IMWRITE_WEBP_QUALITY, 80]
+                    options = [cv2.IMWRITE_JPEG_QUALITY, 80, cv2.IMWRITE_JPEG_OPTIMIZE, 1, int(cv2.IMWRITE_WEBP_QUALITY), 60]
                     cv2.imwrite(save_path, im0, options)
                     print(f" The image with the result is saved in: {save_path}")
                 else:  # 'video' or 'stream'
@@ -178,7 +180,14 @@ def detect(save_img=False):
 
 
 if __name__ == '__main__':
+
+    config = configparser.ConfigParser()
+    config.read('config.txt')
+    defaults = {}
+    defaults.update(dict(config.items("Defaults")))
+    
     parser = argparse.ArgumentParser()
+    parser.set_defaults(**defaults)
     parser.add_argument('--weights', nargs='+', type=str, default='yolov7.pt', help='model.pt path(s)')
     parser.add_argument('--source', type=str, default='input', help='source') 
     parser.add_argument('--img-size', type=int, default=3264, help='inference size (pixels)')
@@ -199,14 +208,20 @@ if __name__ == '__main__':
     parser.add_argument('--blurratio',type=int,default=20, help='blur opacity')
     parser.add_argument('--hidedetarea',action='store_true', help='Hide Detected Area')
     parser.add_argument('--delete',action='store_true', help='Delete Input Files')
+    parser.add_argument('--rotate',type=int, default=0, help='Rotate clockwise 90, 180, 270')
+    parser.add_argument('--limit',type=int, default=10, help='Limit images to process')
     opt = parser.parse_args()
     print(opt)
+
     #check_requirements(exclude=('pycocotools', 'thop'))
 
-    with torch.no_grad():
-        if opt.update:  # update all models (to fix SourceChangeWarning)
-            for opt.weights in ['yolov7.pt']:
+    if lock_script():
+        with torch.no_grad():
+            if opt.update:  # update all models (to fix SourceChangeWarning)
+                for opt.weights in ['yolov7.pt']:
+                    detect()
+                    strip_optimizer(opt.weights)
+            else:
                 detect()
-                strip_optimizer(opt.weights)
-        else:
-            detect()
+    else:
+        print('detect_and_blur already running')

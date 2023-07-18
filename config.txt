@@ -1,0 +1,10 @@
+[Defaults]
+source = ../webcam
+img_size = 3264
+conf_thres = 0.1
+blurratio = 0
+
+[Unset]
+delete = true
+hidedetarea = true
+rotate = 90
