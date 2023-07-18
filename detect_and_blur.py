@@ -59,6 +59,9 @@ def detect(save_img=False):
     else:
         dataset = LoadImages(source, img_size=imgsz, stride=stride, limit=opt.limit, rotate=opt.rotate)
 
+    if (opt.limit):
+        dataset = dataset[:opt.limit]
+
     # Get names and colors
     names = model.module.names if hasattr(model, 'module') else model.names
     colors = [[random.randint(0, 255) for _ in range(3)] for _ in names]
@@ -151,7 +154,13 @@ def detect(save_img=False):
             # Save results (image with detections)
             if save_img:
                 if dataset.mode == 'image':
-                    options = [cv2.IMWRITE_JPEG_QUALITY, 80, cv2.IMWRITE_JPEG_OPTIMIZE, 1, int(cv2.IMWRITE_WEBP_QUALITY), 60]
+                    file_name, file_type = os.path.splitext(save_path)
+                    if (file_type == "webp"):
+                        options = [int(cv2.IMWRITE_WEBP_QUALITY), 60]
+                    elif  (file_type == "jpg" or file_type == "jpeg"):
+                        options = [cv2.IMWRITE_JPEG_QUALITY, 80, cv2.IMWRITE_JPEG_OPTIMIZE, 1]
+                    else:
+                        options = []
                     cv2.imwrite(save_path, im0, options)
                     print(f" The image with the result is saved in: {save_path}")
                 else:  # 'video' or 'stream'
