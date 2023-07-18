@@ -4,5 +4,6 @@ __pycache__
 *.pt
 .DS_Store
 log.txt
+config.txt
 
 !.gitkeep
