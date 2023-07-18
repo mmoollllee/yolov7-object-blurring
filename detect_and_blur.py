@@ -181,10 +181,11 @@ def detect(save_img=False):
 
 if __name__ == '__main__':
 
-    config = configparser.ConfigParser()
-    config.read('config.txt')
     defaults = {}
-    defaults.update(dict(config.items("Defaults")))
+    if os.path.isfile('./config.txt'):
+        config = configparser.ConfigParser()
+        config.read('config.txt')
+        defaults.update(dict(config.items("Defaults")))
     
     parser = argparse.ArgumentParser()
     parser.set_defaults(**defaults)
