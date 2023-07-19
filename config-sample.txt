@@ -1,4 +1,4 @@
-[Defaults]
+[Main]
 source = ../webcam
 img_size = 3264
 conf_thres = 0.1

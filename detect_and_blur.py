@@ -74,6 +74,7 @@ def detect(save_img=False):
     for path, img, im0s, vid_cap in dataset:
         limiter += 1
         if (limiter == opt.limit):
+            print("Limit reached!")
             break
 
         img = torch.from_numpy(img).to(device)
@@ -192,37 +193,53 @@ def detect(save_img=False):
 
 if __name__ == '__main__':
 
-    defaults = {}
     if os.path.isfile('./config.txt'):
         config = configparser.ConfigParser()
         config.read('config.txt')
-        defaults.update(dict(config.items("Defaults")))
+        
+    defaults = {
+        'source': config.get('Main', 'source', fallback='input'),
+        'dest': config.get('Main', 'dest', fallback='output'),
+        'img_size': config.getint('Main', 'img_size', fallback=3264),
+        'conf_thres': config.getfloat('Main', 'conf_thres', fallback=0.25),
+        'blurratio': config.getint('Main', 'blurratio', fallback=20),
+        'rotate': config.getint('Main', 'rotate', fallback=0),
+        'limit': config.getint('Main', 'limit', fallback=10),
+        'compression': config.getint('Main', 'compression', fallback=60),
+        'classes': [0, 1, 2, 3, 5],
+        'delete': config.getboolean('Main', 'delete', fallback=False),
+        'hidedetarea': config.getboolean('Main', 'hidedetarea', fallback=False),
+    }
+
+    print(defaults)
     
     parser = argparse.ArgumentParser()
     parser.set_defaults(**defaults)
     parser.add_argument('--weights', nargs='+', type=str, default='yolov7.pt', help='model.pt path(s)')
-    parser.add_argument('--source', type=str, default='input', help='source') 
-    parser.add_argument('--img-size', type=int, default=3264, help='inference size (pixels)')
-    parser.add_argument('--conf-thres', type=float, default=0.25, help='object confidence threshold')
+    parser.add_argument('--source', type=str, default=defaults['source'], help='source') 
+    parser.add_argument('--dest', default=defaults['dest'], help='results folder name')
+    parser.add_argument('--img-size', type=int, default=defaults['img_size'], help='inference size (pixels)')
+    parser.add_argument('--conf-thres', type=float, default=defaults['conf_thres'], help='object confidence threshold')
+    parser.add_argument('--classes', nargs='+', type=int, default=defaults['classes'], help='filter by class: --class 0, or --class 0 2 3')
+    parser.add_argument('--blurratio',type=int,default=defaults['blurratio'], help='blur opacity')
+    parser.add_argument('--rotate',type=int, default=defaults['rotate'], help='Rotate clockwise 90, 180, 270')
+    parser.add_argument('--limit',type=int, default=defaults['limit'], help='Limit images to process')
+    parser.add_argument('--compression',type=int, default=defaults['compression'], help='Compression Value for Output Images')
+
     parser.add_argument('--iou-thres', type=float, default=0.45, help='IOU threshold for NMS')
     parser.add_argument('--device', default='cpu', help='cuda device, i.e. 0 or 0,1,2,3 or cpu')
     parser.add_argument('--view-img', action='store_true', help='display results')
     parser.add_argument('--save-txt', action='store_true', help='save results to *.txt')
     parser.add_argument('--save-conf', action='store_true', help='save confidences in --save-txt labels')
     parser.add_argument('--nosave', action='store_true', help='do not save images/videos')
-    parser.add_argument('--classes', nargs='+', type=int, default=[0, 1, 2, 3, 5], help='filter by class: --class 0, or --class 0 2 3')
     parser.add_argument('--agnostic-nms', action='store_true', help='class-agnostic NMS')
     parser.add_argument('--augment', action='store_true', help='augmented inference')
     parser.add_argument('--update', action='store_true', help='update all models')
-    parser.add_argument('--dest', default='output', help='results folder name')
+
     parser.add_argument('--increment-dest', action='store_true', help='increment destination folder')
-    parser.add_argument('--no-trace', action='store_true', help='don`t trace model')
-    parser.add_argument('--blurratio',type=int,default=20, help='blur opacity')
     parser.add_argument('--hidedetarea',action='store_true', help='Hide Detected Area')
     parser.add_argument('--delete',action='store_true', help='Delete Input Files')
-    parser.add_argument('--rotate',type=int, default=0, help='Rotate clockwise 90, 180, 270')
-    parser.add_argument('--limit',type=int, default=10, help='Limit images to process')
-    parser.add_argument('--compression',type=int, default=60, help='Compression Value for Output Images')
+    parser.add_argument('--no-trace', action='store_true', help='don`t trace model')
     opt = parser.parse_args()
     print(opt)
 
