@@ -16,7 +16,7 @@ def lock_script() -> bool:
    """
    
    global lockfile  # file must remain open until program quits
-   lockfile = open(f'/tmp/{Path(__file__).name}.lock', 'w')
+   lockfile = open(f'.lock', 'w')
    
    try:
       # Try to grab an exclusive lock on the file, raise error otherwise
