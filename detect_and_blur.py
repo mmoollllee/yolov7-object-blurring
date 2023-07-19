@@ -210,8 +210,6 @@ if __name__ == '__main__':
         'delete': config.getboolean('Main', 'delete', fallback=False),
         'hidedetarea': config.getboolean('Main', 'hidedetarea', fallback=False),
     }
-
-    print(defaults)
     
     parser = argparse.ArgumentParser()
     parser.set_defaults(**defaults)
