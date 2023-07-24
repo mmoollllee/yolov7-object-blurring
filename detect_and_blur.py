@@ -19,7 +19,7 @@ from utils.lock import lock_script
 
 
 def detect(save_img=False):
-    source, weights, view_img, save_txt, imgsz, trace, blurratio,hidedetarea = opt.source, opt.weights, opt.view_img, opt.save_txt, opt.img_size, not opt.no_trace, opt.blurratio,opt.hidedetarea
+    source, weights, view_img, save_txt, imgsz, trace, blurratio, hidedetarea, save_org = opt.source, opt.weights, opt.view_img, opt.save_txt, opt.img_size, not opt.no_trace, opt.blurratio, opt.hidedetarea, opt.save_org
     save_img = not opt.nosave and not source.endswith('.txt')  # save inference images
     webcam = source.isnumeric() or source.endswith('.txt') or source.lower().startswith(
         ('rtsp://', 'rtmp://', 'http://', 'https://'))
@@ -124,9 +124,27 @@ def detect(save_img=False):
                     n = (det[:, -1] == c).sum()  # detections per class
                     s += f"{n} {names[int(c)]}{'s' * (n > 1)}, "  # add to string
 
+                file_name, file_type = os.path.splitext(save_path)
+                if (file_type == ".webp"):
+                    options = [int(cv2.IMWRITE_WEBP_QUALITY), opt.compression]
+                elif  (file_type == ".jpg" or file_type == ".jpeg"):
+                    options = [cv2.IMWRITE_JPEG_QUALITY, opt.compression, cv2.IMWRITE_JPEG_OPTIMIZE, 1]
+                else:
+                    options = []
+
+                if save_org and save_txt:
+                    print(f"Saving original image to {txt_path}{file_type}");
+                    cv2.imwrite(txt_path + file_type, im0, options)
+
                 # Write results
                 for *xyxy, conf, cls in reversed(det):
                     
+                    if save_txt:  # Write to file
+                        xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()  # normalized xywh
+                        line = (cls, *xywh, conf) if opt.save_conf else (cls, *xywh)  # label format
+                        with open(txt_path + '.txt', 'a') as f:
+                            f.write(('%g ' * len(line)).rstrip() % line + '\n')
+
                     #Add Object Blurring Code
                     #..................................................................
                     if blurratio:
@@ -135,12 +153,6 @@ def detect(save_img=False):
                         im0[int(xyxy[1]):int(xyxy[3]),int(xyxy[0]):int(xyxy[2])] = blur
                     #..................................................................
                     
-                    if save_txt:  # Write to file
-                        xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()  # normalized xywh
-                        line = (cls, *xywh, conf) if opt.save_conf else (cls, *xywh)  # label format
-                        with open(txt_path + '.txt', 'a') as f:
-                            f.write(('%g ' * len(line)).rstrip() % line + '\n')
-
                     if save_img or view_img:  # Add bbox to image
                         label = f'{names[int(cls)]} {conf:.2f}'
                         if not hidedetarea:
@@ -157,13 +169,6 @@ def detect(save_img=False):
             # Save results (image with detections)
             if save_img:
                 if dataset.mode == 'image':
-                    file_name, file_type = os.path.splitext(save_path)
-                    if (file_type == "webp"):
-                        options = [int(cv2.IMWRITE_WEBP_QUALITY), opt.compression]
-                    elif  (file_type == "jpg" or file_type == "jpeg"):
-                        options = [cv2.IMWRITE_JPEG_QUALITY, opt.compression, cv2.IMWRITE_JPEG_OPTIMIZE, 1]
-                    else:
-                        options = []
                     cv2.imwrite(save_path, im0, options)
                     print(f" The image with the result is saved in: {save_path}")
                 else:  # 'video' or 'stream'
@@ -209,6 +214,8 @@ if __name__ == '__main__':
         'classes': [0, 1, 2, 3, 5],
         'delete': config.getboolean('Main', 'delete', fallback=False),
         'hidedetarea': config.getboolean('Main', 'hidedetarea', fallback=False),
+        'save_org': config.getboolean('Main', 'save_org', fallback=False),
+        'save_txt': config.getboolean('Main', 'save_txt', fallback=False),
     }
     
     parser = argparse.ArgumentParser()

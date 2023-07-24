@@ -1,10 +1,14 @@
 [Main]
 source = ../webcam
 img_size = 3264
-conf_thres = 0.1
-blurratio = 0
+conf_thres = 0.3
+blurratio = 20
+compression = 80
+dest = ../webcam-private
+save_org = True
+rotate = 270
+save_txt = True
+hidedetarea = True
+delete = True
 
 [Unset]
-delete = true
-hidedetarea = true
-rotate = 90
