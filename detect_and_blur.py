@@ -115,6 +115,15 @@ def detect(save_img=False):
             save_path = str(save_dir / p.name)  # img.jpg
             txt_path = str(save_dir / 'labels' / p.stem) + ('' if dataset.mode == 'image' else f'_{frame}')  # img.txt
             gn = torch.tensor(im0.shape)[[1, 0, 1, 0]]  # normalization gain whwh
+
+            file_name, file_type = os.path.splitext(save_path)
+            if (file_type == ".webp"):
+                options = [int(cv2.IMWRITE_WEBP_QUALITY), opt.compression]
+            elif  (file_type == ".jpg" or file_type == ".jpeg"):
+                options = [cv2.IMWRITE_JPEG_QUALITY, opt.compression, cv2.IMWRITE_JPEG_OPTIMIZE, 1]
+            else:
+                options = []
+
             if len(det):
                 # Rescale boxes from img_size to im0 size
                 det[:, :4] = scale_coords(img.shape[2:], det[:, :4], im0.shape).round()
@@ -123,14 +132,6 @@ def detect(save_img=False):
                 for c in det[:, -1].unique():
                     n = (det[:, -1] == c).sum()  # detections per class
                     s += f"{n} {names[int(c)]}{'s' * (n > 1)}, "  # add to string
-
-                file_name, file_type = os.path.splitext(save_path)
-                if (file_type == ".webp"):
-                    options = [int(cv2.IMWRITE_WEBP_QUALITY), opt.compression]
-                elif  (file_type == ".jpg" or file_type == ".jpeg"):
-                    options = [cv2.IMWRITE_JPEG_QUALITY, opt.compression, cv2.IMWRITE_JPEG_OPTIMIZE, 1]
-                else:
-                    options = []
 
                 if save_org and save_txt:
                     print(f"Saving original image to {txt_path}{file_type}");
