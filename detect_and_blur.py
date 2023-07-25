@@ -247,11 +247,11 @@ if __name__ == '__main__':
     parser.add_argument('--delete',action='store_true', help='Delete Input Files')
     parser.add_argument('--no-trace', action='store_true', help='don`t trace model')
     opt = parser.parse_args()
-    print(opt)
 
     #check_requirements(exclude=('pycocotools', 'thop'))
 
     if lock_script():
+        print(opt)
         with torch.no_grad():
             if opt.update:  # update all models (to fix SourceChangeWarning)
                 for opt.weights in ['yolov7.pt']:
@@ -259,5 +259,5 @@ if __name__ == '__main__':
                     strip_optimizer(opt.weights)
             else:
                 detect()
-    else:
-        print('detect_and_blur already running')
+    # else:
+    #     print('detect_and_blur already running')
