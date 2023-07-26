@@ -189,6 +189,9 @@ class LoadImages:  # for inference
             self.count += 1
             img0 = cv2.imread(path)  # BGR
 
+            if img0 is None:
+                return
+
             if (self.rotate == 90):
                 img0 = cv2.rotate(img0, cv2.ROTATE_90_CLOCKWISE)
             elif (self.rotate == 180):
